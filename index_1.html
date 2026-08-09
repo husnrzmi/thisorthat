@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>This or That</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1B1035;
+    --bg-glow: #2A1750;
+    --card: #FFF8ED;
+    --coral: #FF5D73;
+    --yellow: #FFC857;
+    --teal: #38B2AC;
+    --text-dark: #241245;
+    --text-light: #F4EEFF;
+    --muted: #A79BCB;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Poppins', sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, var(--bg-glow), transparent 55%),
+      radial-gradient(circle at 85% 90%, #3a1a5c, transparent 50%),
+      var(--bg);
+    color: var(--text-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px 16px;
+  }
+
+  .app{ width:100%; max-width: 560px; }
+
+  h1, h2, .display{
+    font-family:'Baloo 2', sans-serif;
+  }
+
+  /* ---------- Screens ---------- */
+  .screen{ display:none; animation: fadeIn .4s ease; }
+  .screen.active{ display:block; }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  /* ---------- Landing ---------- */
+  .landing{ text-align:center; }
+  .landing .eyebrow{
+    color: var(--yellow);
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight:600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .landing h1{
+    font-size: 44px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    line-height:1.1;
+  }
+  .landing h1 span{ color: var(--coral); }
+  .landing p{
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 32px;
+  }
+  .name-input{
+    width:100%;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 2px solid transparent;
+    background: rgba(255,255,255,0.08);
+    color: var(--text-light);
+    font-family:'Poppins', sans-serif;
+    font-size: 16px;
+    margin-bottom: 16px;
+    outline:none;
+    transition: border-color .2s;
+  }
+  .name-input::placeholder{ color: var(--muted); }
+  .name-input:focus{ border-color: var(--coral); }
+
+  .btn{
+    display:inline-block;
+    border:none;
+    cursor:pointer;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size: 18px;
+    padding: 16px 32px;
+    border-radius: 100px;
+    background: var(--coral);
+    color: #1B1035;
+    box-shadow: 0 8px 0 #C23F53, 0 10px 20px rgba(255,93,115,0.3);
+    transition: transform .12s ease, box-shadow .12s ease;
+    width:100%;
+  }
+  .btn:active{
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 #C23F53, 0 4px 10px rgba(255,93,115,0.3);
+  }
+  .btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    box-shadow:none;
+    transform:none;
+  }
+
+  /* ---------- Quiz ---------- */
+  .progress-row{
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    margin-bottom: 28px;
+  }
+  .dot{
+    height:8px;
+    width:8px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.15);
+    transition: all .25s;
+  }
+  .dot.done{ background: var(--teal); width:22px; border-radius:6px; }
+  .dot.current{ background: var(--yellow); width:22px; border-radius:6px; }
+
+  .question-num{
+    text-align:center;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight:600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .question-text{
+    text-align:center;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 28px;
+    line-height:1.25;
+  }
+
+  .options{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 420px){
+    .options{ grid-template-columns: 1fr; }
+  }
+
+  .option{
+    background: var(--card);
+    color: var(--text-dark);
+    border-radius: 20px;
+    border: 3px solid transparent;
+    padding: 26px 16px;
+    text-align:center;
+    cursor:pointer;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+  .option:hover{ transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,0.25); }
+  .option.picked{
+    border-color: var(--yellow);
+    transform: scale(0.97);
+  }
+  .option .emoji{ font-size: 48px; line-height:1; }
+  .option img{
+    width:100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+  .option .label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size: 17px;
+  }
+  .or-divider{
+    text-align:center;
+    color: var(--muted);
+    font-family:'Baloo 2', sans-serif;
+    font-size: 13px;
+    margin: 2px 0;
+    display:none;
+  }
+
+  /* ---------- End screen ---------- */
+  .end{ text-align:center; }
+  .end .big-emoji{ font-size: 64px; margin-bottom: 12px; }
+  .end h2{ font-size: 30px; margin: 0 0 10px; }
+  .end p{ color: var(--muted); font-size: 15px; margin: 0 0 6px; }
+  .status{ margin-top: 22px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- LANDING -->
+  <div class="screen active" id="screen-landing">
+    <div class="landing">
+      <div class="eyebrow">a tiny game</div>
+      <h1>This <span>or</span> That</h1>
+      <p>Quick picks, no wrong answers. Type your name to start.</p>
+      <input type="text" id="playerName" class="name-input" placeholder="Your name" maxlength="40">
+      <button class="btn" id="startBtn" onclick="startGame()">Let's go →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="progress-row" id="progressRow"></div>
+    <div class="question-num" id="questionNum"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsWrap"></div>
+  </div>
+
+  <!-- END -->
+  <div class="screen" id="screen-end">
+    <div class="end">
+      <div class="big-emoji">🎉</div>
+      <h2>Nice picks!</h2>
+      <p id="endName"></p>
+      <p>Thanks for playing.</p>
+      <div class="status" id="submitStatus">Saving your answers…</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  /* =========================================================
+     EDIT YOUR QUESTIONS HERE
+     - type "emoji"  -> decoy question, shown as big emoji + label
+     - type "image"  -> real question, shown as a photo
+     - Put your real question anywhere in the middle of the list,
+       not first or last, so it doesn't stand out.
+  ========================================================== */
+  const QUESTIONS = [
+    {
+      question: "What colour do you love?",
+      type: "emoji",
+      a: { label: "Pink", emoji: "💗" },
+      b: { label: "Purple", emoji: "💜" }
+    },
+    {
+      question: "What's your vibe today?",
+      type: "emoji",
+      a: { label: "Duduk rumah", emoji: "🏠" },
+      b: { label: "Keluar main", emoji: "🎡" }
+    },
+    {
+      question: "Which bag speaks to you?",
+      type: "image",
+      a: { label: "Bag A", image: "images/backpack-a.jpg" },
+      b: { label: "Bag B", image: "images/backpack-b.jpg" }
+    },
+    {
+      question: "What flavour wins your heart?",
+      type: "emoji",
+      a: { label: "Chocolate", emoji: "🍫" },
+      b: { label: "Strawberry", emoji: "🍓" }
+    }
+  ];
+
+  // Paste your Formspree endpoint here after you create a free form at formspree.io
+  // It looks like: https://formspree.io/f/abcdwxyz
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xyegkvny;
+
+  let currentIndex = 0;
+  let playerName = "";
+  const answers = [];
+
+  function startGame(){
+    const nameInput = document.getElementById('playerName');
+    playerName = nameInput.value.trim();
+    if(!playerName){
+      nameInput.focus();
+      nameInput.style.borderColor = "#FF5D73";
+      return;
+    }
+    document.getElementById('screen-landing').classList.remove('active');
+    document.getElementById('screen-quiz').classList.add('active');
+    renderProgress();
+    renderQuestion();
+  }
+
+  function renderProgress(){
+    const row = document.getElementById('progressRow');
+    row.innerHTML = "";
+    QUESTIONS.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i < currentIndex ? ' done' : i === currentIndex ? ' current' : '');
+      row.appendChild(dot);
+    });
+  }
+
+  function renderQuestion(){
+    const q = QUESTIONS[currentIndex];
+    document.getElementById('questionNum').textContent = `Question ${currentIndex + 1} of ${QUESTIONS.length}`;
+    document.getElementById('questionText').textContent = q.question;
+
+    const wrap = document.getElementById('optionsWrap');
+    wrap.innerHTML = "";
+
+    ['a','b'].forEach(key => {
+      const opt = q[key];
+      const el = document.createElement('div');
+      el.className = 'option';
+      el.onclick = () => selectOption(key);
+
+      if(q.type === 'image'){
+        el.innerHTML = `<img src="${opt.image}" alt="${opt.label}"><div class="label">${opt.label}</div>`;
+      } else {
+        el.innerHTML = `<div class="emoji">${opt.emoji}</div><div class="label">${opt.label}</div>`;
+      }
+      wrap.appendChild(el);
+    });
+  }
+
+  function selectOption(key){
+    const q = QUESTIONS[currentIndex];
+    answers.push({
+      question: q.question,
+      picked: q[key].label
+    });
+
+    // little visual pop before moving on
+    const opts = document.querySelectorAll('.option');
+    opts.forEach(o => o.style.pointerEvents = 'none');
+    const pickedEl = key === 'a' ? opts[0] : opts[1];
+    pickedEl.classList.add('picked');
+
+    setTimeout(() => {
+      currentIndex++;
+      if(currentIndex < QUESTIONS.length){
+        renderProgress();
+        renderQuestion();
+      } else {
+        finishGame();
+      }
+    }, 350);
+  }
+
+  function finishGame(){
+    document.getElementById('screen-quiz').classList.remove('active');
+    document.getElementById('screen-end').classList.add('active');
+    document.getElementById('endName').textContent = `${playerName}, your answers are locked in.`;
+    submitAnswers();
+  }
+
+  async function submitAnswers(){
+    const statusEl = document.getElementById('submitStatus');
+
+    if(FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')){
+      statusEl.textContent = "⚠️ Set up your Formspree link in index.html to save answers.";
+      return;
+    }
+
+    const payload = {
+      name: playerName,
+      submittedAt: new Date().toISOString(),
+    };
+    answers.forEach((a, i) => {
+      payload[`Q${i + 1}: ${a.question}`] = a.picked;
+    });
+
+    try{
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if(res.ok){
+        statusEl.textContent = "Saved ✓";
+      } else {
+        statusEl.textContent = "Hmm, something went wrong saving your answers.";
+      }
+    } catch(err){
+      statusEl.textContent = "Couldn't save — check your connection.";
+    }
+  }
+</script>
+
+</body>
+</html>
